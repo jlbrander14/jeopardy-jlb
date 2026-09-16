@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Jeopardy — Buzzer</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- JOIN -->
+<section id="screen-join" class="center-screen">
+  <h1 class="jp-title">JEOPARDY!</h1>
+  <div class="jp-card">
+    <label class="jp-label">Room Code</label>
+    <input class="jp-input" id="join-code" maxlength="4" autocapitalize="characters" placeholder="ABCD" style="text-transform:uppercase; letter-spacing:4px; text-align:center; font-size:1.4rem;">
+    <label class="jp-label">Your Name</label>
+    <input class="jp-input" id="join-name" maxlength="20" placeholder="Your name">
+    <button class="jp-btn" id="btn-join" style="width:100%;">Join Game</button>
+    <p class="hint" id="join-error" style="color:#ff6b6b;"></p>
+    <p class="hint" id="join-status"></p>
+  </div>
+</section>
+
+<!-- BUZZER (main gameplay) -->
+<section id="screen-buzzer" class="buzzer-wrap" style="display:none;">
+  <div>
+    <div class="hint" id="buzzer-player-name"></div>
+    <div class="my-score" id="my-score">$0</div>
+  </div>
+  <div style="width:100%;">
+    <div class="status-text" id="status-text">Waiting for the game to start…</div>
+    <button class="buzzer-btn" id="buzz-btn" disabled>BUZZ</button>
+  </div>
+  <div class="hint" id="buzzer-footer"></div>
+</section>
+
+<!-- FINAL: WAGER -->
+<section id="screen-final-wager" class="center-screen" style="display:none;">
+  <h1 class="jp-title">FINAL JEOPARDY!</h1>
+  <div class="jp-card">
+    <p class="hint">Category</p>
+    <h2 id="fw-category" style="color:var(--jp-white); margin-top:0;"></h2>
+    <p class="my-score" id="fw-score" style="font-size:1.6rem;"></p>
+    <label class="jp-label">Your Wager</label>
+    <input class="jp-input" id="fw-input" type="number" min="0" step="1" value="0">
+    <button class="jp-btn" id="btn-fw-submit" style="width:100%;">Lock In Wager</button>
+    <p class="hint" id="fw-status"></p>
+  </div>
+</section>
+
+<!-- FINAL: ANSWER -->
+<section id="screen-final-answer" class="center-screen" style="display:none;">
+  <h1 class="jp-title" style="font-size:1.6rem;">FINAL JEOPARDY!</h1>
+  <div class="jp-card">
+    <p class="hint" id="fa-category"></p>
+    <p style="font-size:1.2rem;" id="fa-clue"></p>
+    <div class="room-code" id="fa-timer" style="font-size:1.6rem;"></div>
+    <label class="jp-label">Your Answer</label>
+    <textarea class="jp-input" id="fa-input" placeholder="Type your response…"></textarea>
+    <button class="jp-btn" id="btn-fa-submit" style="width:100%;">Submit Answer</button>
+    <p class="hint" id="fa-status"></p>
+  </div>
+</section>
+
+<!-- FINAL: RESULT -->
+<section id="screen-final-result" class="center-screen" style="display:none;">
+  <h1 class="jp-title" id="fr-title">RESULT</h1>
+  <div class="jp-card">
+    <div class="my-score" id="fr-score"></div>
+  </div>
+</section>
+
+<!-- GAME OVER -->
+<section id="screen-gameover" class="center-screen" style="display:none;">
+  <h1 class="jp-title" id="go-title">GAME OVER</h1>
+  <div id="go-standings"></div>
+</section>
+
+<script src="vendor/peerjs.min.js"></script>
+<script src="js/player.js"></script>
+</body>
+</html>

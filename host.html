@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Jeopardy — Host</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- SETUP -->
+<section id="screen-setup" class="center-screen">
+  <h1 class="jp-title">JEOPARDY!</h1>
+  <div id="setup-precreate">
+    <p class="jp-subtitle">Click below to open a room. Put this window on your TV.</p>
+    <button class="jp-btn" id="btn-create-room">Create Room</button>
+  </div>
+
+  <div id="setup-postcreate" style="display:none;">
+    <p class="jp-subtitle">Players scan this to join on their phones:</p>
+    <div class="qr-box"><div id="qr"></div></div>
+    <div class="room-code" id="room-code">----</div>
+    <p class="hint">Or have them open <span id="player-url" style="color:var(--jp-gold)"></span> and type the code above.</p>
+
+    <h3 style="color:var(--jp-gold); margin-top:24px;">Players joined</h3>
+    <ul class="player-list" id="setup-player-list"><li style="opacity:0.6;">Waiting for players…</li></ul>
+
+    <div class="jp-row" style="margin-top:20px;">
+      <button class="jp-btn" id="btn-start-game" disabled>Start Game</button>
+    </div>
+    <p class="hint" id="start-hint">Need at least 1 player to start.</p>
+  </div>
+</section>
+
+<!-- BOARD -->
+<section id="screen-board" class="board-wrap" style="display:none;">
+  <div class="board-header">
+    <div class="round-name" id="round-name">Jeopardy Round</div>
+    <div class="jp-row">
+      <button class="jp-btn secondary" id="btn-goto-round2" style="display:none;">Start Double Jeopardy →</button>
+      <button class="jp-btn secondary" id="btn-goto-final" style="display:none;">Final Jeopardy →</button>
+    </div>
+  </div>
+  <div class="scoreboard" id="scoreboard-board"></div>
+  <div class="jp-grid" id="jp-grid"></div>
+</section>
+
+<!-- CLUE -->
+<section id="screen-clue" class="board-wrap" style="display:none;">
+  <div class="scoreboard" id="scoreboard-clue"></div>
+  <div class="clue-screen">
+    <div class="clue-category" id="clue-category-label"></div>
+    <div class="clue-text" id="clue-text"></div>
+    <div class="clue-answer" id="clue-answer" style="display:none;"></div>
+    <div class="buzz-order" id="buzz-order"></div>
+  </div>
+  <div class="control-bar" id="clue-controls"></div>
+</section>
+
+<!-- DAILY DOUBLE SETUP (host-only) -->
+<section id="screen-ddsetup" class="center-screen" style="display:none;">
+  <h1 class="jp-title" style="color:var(--jp-white);">DAILY DOUBLE!</h1>
+  <div class="jp-card">
+    <label class="jp-label">Who found it?</label>
+    <select class="jp-input" id="dd-controller"></select>
+    <label class="jp-label">Wager</label>
+    <input class="jp-input" id="dd-wager" type="number" min="5" step="5">
+    <p class="hint" id="dd-hint"></p>
+    <button class="jp-btn" id="btn-dd-confirm">Reveal Clue</button>
+  </div>
+</section>
+
+<!-- FINAL: CATEGORY / WAGERS -->
+<section id="screen-finalcat" class="center-screen" style="display:none;">
+  <h1 class="jp-title">FINAL JEOPARDY!</h1>
+  <h2 id="final-category" style="color:var(--jp-white);"></h2>
+  <p class="jp-subtitle" id="final-wager-count">Waiting for wagers… 0/0</p>
+  <div class="scoreboard" id="scoreboard-finalcat"></div>
+  <button class="jp-btn" id="btn-final-reveal-clue">Reveal Clue</button>
+</section>
+
+<!-- FINAL: CLUE / ANSWERS -->
+<section id="screen-finalclue" class="board-wrap" style="display:none;">
+  <div class="clue-screen">
+    <div class="clue-category" id="final-clue-category"></div>
+    <div class="clue-text" id="final-clue-text"></div>
+    <div class="jp-subtitle" id="final-timer" style="font-size:2rem; color:var(--jp-gold);">30</div>
+    <p class="jp-subtitle" id="final-answer-count">0/0 answered</p>
+  </div>
+  <div class="control-bar">
+    <button class="jp-btn" id="btn-final-judge">Judge Answers</button>
+  </div>
+</section>
+
+<!-- FINAL: JUDGE -->
+<section id="screen-finaljudge" class="center-screen" style="display:none;">
+  <h1 class="jp-title">FINAL JEOPARDY!</h1>
+  <div class="jp-card" id="final-judge-card">
+    <h2 id="fj-name" style="color:var(--jp-white);"></h2>
+    <p class="hint">Wager</p>
+    <p class="room-code" id="fj-wager" style="font-size:1.8rem;"></p>
+    <p class="hint">Answer</p>
+    <p style="font-size:1.4rem;" id="fj-answer"></p>
+    <div class="jp-row" style="margin-top:16px;">
+      <button class="jp-btn success" id="btn-fj-correct">✔ Correct</button>
+      <button class="jp-btn danger" id="btn-fj-wrong">✘ Wrong</button>
+      <button class="jp-btn" id="btn-fj-standings" style="display:none;">Show Final Standings</button>
+    </div>
+  </div>
+</section>
+
+<!-- GAME OVER -->
+<section id="screen-gameover" class="center-screen" style="display:none;">
+  <h1 class="jp-title">FINAL STANDINGS</h1>
+  <div id="final-standings"></div>
+  <button class="jp-btn" id="btn-new-game" style="margin-top:24px;">New Game</button>
+</section>
+
+<script src="vendor/peerjs.min.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script src="js/data.js"></script>
+<script src="js/host.js"></script>
+</body>
+</html>
