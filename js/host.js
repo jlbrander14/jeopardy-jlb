@@ -6,6 +6,7 @@
 
   let peer = null;
   let roomCode = "";
+  let GAME = null; // { title, author, round1, round2|null, final|null }
   const players = new Map(); // peerId -> { name, score, conn }
 
   const state = {
@@ -87,9 +88,58 @@
     return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 
+  // ---------- game selection ----------
+
+  async function loadManifest() {
+    const select = $("game-select");
+    try {
+      const res = await fetch("games/manifest.json", { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const manifest = await res.json();
+      if (!Array.isArray(manifest) || manifest.length === 0) throw new Error("no games listed");
+
+      select.innerHTML = manifest
+        .map(g => `<option value="${escapeHtml(g.file)}">${escapeHtml(g.title)}${g.author ? " — " + escapeHtml(g.author) : ""}</option>`)
+        .join("");
+      $("btn-create-room").disabled = false;
+      $("game-select-hint").textContent = "";
+    } catch (err) {
+      console.error("Could not load games/manifest.json", err);
+      select.innerHTML = '<option value="">No games found</option>';
+      $("game-select-hint").textContent =
+        "Could not load games/manifest.json — add a game CSV to the games/ folder and run scripts/build-manifest.js.";
+    }
+  }
+
+  async function loadSelectedGame() {
+    const file = $("game-select").value;
+    if (!file) throw new Error("Please choose a game first.");
+    const res = await fetch(file, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Could not fetch ${file} (HTTP ${res.status})`);
+    const text = await res.text();
+    const result = GameLoader.parseGameCsv(text);
+    if (result.warnings.length) {
+      console.warn(`Warnings loading ${file}:\n- ` + result.warnings.join("\n- "));
+    }
+    GAME = result.game;
+    document.title = "Jeopardy — " + GAME.title;
+  }
+
   // ---------- peer / networking ----------
 
-  function createRoom() {
+  async function createRoom() {
+    const btn = $("btn-create-room");
+    btn.disabled = true;
+    btn.textContent = "Loading game…";
+    try {
+      await loadSelectedGame();
+    } catch (err) {
+      console.error(err);
+      alert("Could not load this game:\n" + err.message);
+      btn.disabled = false;
+      btn.textContent = "Create Room";
+      return;
+    }
     tryCreatePeer(0);
   }
 
@@ -127,6 +177,8 @@
     $("setup-precreate").style.display = "none";
     $("setup-postcreate").style.display = "block";
     $("room-code").textContent = roomCode;
+    $("game-title-display").textContent = GAME.title + (GAME.author ? " (by " + GAME.author + ")" : "");
+    $("game-title-label").textContent = GAME.title;
 
     const playerUrl = location.href.replace(/host\.html.*$/, "player.html") + "?host=" + encodeURIComponent(peer.id);
     $("player-url").textContent = location.href.replace(/host\.html.*$/, "player.html");
@@ -183,7 +235,7 @@
 
   function startRound(key) {
     state.round = key;
-    const data = JEOPARDY_DATA[key];
+    const data = GAME[key];
     state.board = data.categories.map(cat => ({
       name: cat.name,
       clues: cat.clues.map(c => ({ ...c, used: false }))
@@ -208,17 +260,21 @@
     });
     grid.appendChild(catRow);
 
-    const numClues = state.board[0].clues.length;
+    const numClues = Math.max(0, ...state.board.map(cat => cat.clues.length));
     for (let r = 0; r < numClues; r++) {
       const row = document.createElement("div");
       row.className = "jp-grid-row";
       state.board.forEach((cat, catIdx) => {
         const clue = cat.clues[r];
         const cell = document.createElement("div");
-        cell.className = "jp-cell" + (clue.used ? " used" : "");
-        cell.textContent = "$" + clue.value;
-        if (!clue.used) {
-          cell.addEventListener("click", () => selectClue(catIdx, r));
+        if (!clue) {
+          cell.className = "jp-cell used";
+        } else {
+          cell.className = "jp-cell" + (clue.used ? " used" : "");
+          cell.textContent = "$" + clue.value;
+          if (!clue.used) {
+            cell.addEventListener("click", () => selectClue(catIdx, r));
+          }
         }
         row.appendChild(cell);
       });
@@ -230,8 +286,15 @@
 
   function checkRoundControls() {
     const allUsed = state.board.every(cat => cat.clues.every(c => c.used));
-    $("btn-goto-round2").style.display = state.round === "round1" && allUsed ? "inline-block" : "none";
-    $("btn-goto-final").style.display = state.round === "round2" && allUsed ? "inline-block" : "none";
+    const roundDone = allUsed && ((state.round === "round1") || (state.round === "round2"));
+    const isLastNormalRound = state.round === "round2" || (state.round === "round1" && !GAME.round2);
+
+    $("btn-goto-round2").style.display =
+      state.round === "round1" && allUsed && GAME.round2 ? "inline-block" : "none";
+    $("btn-goto-final").style.display =
+      roundDone && isLastNormalRound && GAME.final ? "inline-block" : "none";
+    $("btn-finish-nofinal").style.display =
+      roundDone && isLastNormalRound && !GAME.final ? "inline-block" : "none";
   }
 
   function selectClue(catIdx, clueIdx) {
@@ -422,10 +485,10 @@
 
   function startFinal() {
     state.final = { wagers: new Map(), answers: new Map(), order: [], judgeIndex: 0, timer: null, secondsLeft: FINAL_ANSWER_SECONDS };
-    $("final-category").textContent = JEOPARDY_DATA.final.category;
+    $("final-category").textContent = GAME.final.category;
     renderScoreboards(getPlayersArray());
     updateFinalWagerCount();
-    broadcast({ type: "finalCategory", category: JEOPARDY_DATA.final.category });
+    broadcast({ type: "finalCategory", category: GAME.final.category });
     showScreen("screen-finalcat");
   }
 
@@ -439,10 +502,10 @@
     players.forEach((p, id) => {
       if (!state.final.wagers.has(id)) state.final.wagers.set(id, 0);
     });
-    $("final-clue-category").textContent = JEOPARDY_DATA.final.category;
-    $("final-clue-text").textContent = JEOPARDY_DATA.final.clue;
+    $("final-clue-category").textContent = GAME.final.category;
+    $("final-clue-text").textContent = GAME.final.clue;
     updateFinalAnswerCount();
-    broadcast({ type: "finalClue", clue: JEOPARDY_DATA.final.clue, seconds: FINAL_ANSWER_SECONDS });
+    broadcast({ type: "finalClue", clue: GAME.final.clue, seconds: FINAL_ANSWER_SECONDS });
     showScreen("screen-finalclue");
 
     state.final.secondsLeft = FINAL_ANSWER_SECONDS;
@@ -530,6 +593,7 @@
   $("btn-start-game").addEventListener("click", () => startRound("round1"));
   $("btn-goto-round2").addEventListener("click", () => startRound("round2"));
   $("btn-goto-final").addEventListener("click", startFinal);
+  $("btn-finish-nofinal").addEventListener("click", finishGame);
   $("btn-dd-confirm").addEventListener("click", confirmDailyDouble);
   $("btn-final-reveal-clue").addEventListener("click", revealFinalClue);
   $("btn-final-judge").addEventListener("click", startJudging);
@@ -537,4 +601,6 @@
   $("btn-fj-wrong").addEventListener("click", () => judgeFinal(false));
   $("btn-fj-standings").addEventListener("click", finishGame);
   $("btn-new-game").addEventListener("click", () => location.reload());
+
+  loadManifest();
 })();

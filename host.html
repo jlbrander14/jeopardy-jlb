@@ -12,11 +12,17 @@
 <section id="screen-setup" class="center-screen">
   <h1 class="jp-title">JEOPARDY!</h1>
   <div id="setup-precreate">
-    <p class="jp-subtitle">Click below to open a room. Put this window on your TV.</p>
-    <button class="jp-btn" id="btn-create-room">Create Room</button>
+    <p class="jp-subtitle">Choose tonight's game, then open a room. Put this window on your TV.</p>
+    <div class="jp-card" style="text-align:left;">
+      <label class="jp-label">Game</label>
+      <select class="jp-input" id="game-select"><option value="">Loading games…</option></select>
+      <p class="hint" id="game-select-hint"></p>
+      <button class="jp-btn" id="btn-create-room" disabled style="width:100%; margin-top:8px;">Create Room</button>
+    </div>
   </div>
 
   <div id="setup-postcreate" style="display:none;">
+    <p class="jp-subtitle">Playing: <strong id="game-title-display" style="color:var(--jp-gold);"></strong></p>
     <p class="jp-subtitle">Players scan this to join on their phones:</p>
     <div class="qr-box"><div id="qr"></div></div>
     <div class="room-code" id="room-code">----</div>
@@ -35,10 +41,14 @@
 <!-- BOARD -->
 <section id="screen-board" class="board-wrap" style="display:none;">
   <div class="board-header">
-    <div class="round-name" id="round-name">Jeopardy Round</div>
+    <div>
+      <div class="round-name" id="round-name">Jeopardy Round</div>
+      <div class="hint" id="game-title-label"></div>
+    </div>
     <div class="jp-row">
       <button class="jp-btn secondary" id="btn-goto-round2" style="display:none;">Start Double Jeopardy →</button>
       <button class="jp-btn secondary" id="btn-goto-final" style="display:none;">Final Jeopardy →</button>
+      <button class="jp-btn secondary" id="btn-finish-nofinal" style="display:none;">Finish Game →</button>
     </div>
   </div>
   <div class="scoreboard" id="scoreboard-board"></div>
@@ -118,7 +128,8 @@
 
 <script src="vendor/peerjs.min.js"></script>
 <script src="vendor/qrcode.js"></script>
-<script src="js/data.js"></script>
+<script src="vendor/papaparse.min.js"></script>
+<script src="js/game-loader.js"></script>
 <script src="js/host.js"></script>
 </body>
 </html>
