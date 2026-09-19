@@ -28,5 +28,11 @@
     "title": "Old Sport's Jeopardy",
     "author": "Nolan",
     "file": "games/old-sports-jeopardy.csv"
+  },
+  {
+    "id": "sullys-soccer-game",
+    "title": "Soccer Jeopardy",
+    "author": "Michael Sullivan",
+    "file": "games/sullys-soccer-game.csv"
   }
 ]
