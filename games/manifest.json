@@ -22,5 +22,11 @@
     "title": "Mountain Men",
     "author": "Justin",
     "file": "games/mountain-men.csv"
+  },
+  {
+    "id": "old-sports-jeopardy",
+    "title": "Old Sport's Jeopardy",
+    "author": "Nolan",
+    "file": "games/old-sports-jeopardy.csv"
   }
 ]
