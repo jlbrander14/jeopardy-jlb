@@ -1,5 +1,11 @@
 [
   {
+    "id": "beers-beers-galore",
+    "title": "BEERS BEERS GALORE",
+    "author": "Brody King",
+    "file": "games/beers-beers-galore.csv"
+  },
+  {
     "id": "classic-trivia",
     "title": "Classic Trivia Night",
     "author": "Sample Game",
