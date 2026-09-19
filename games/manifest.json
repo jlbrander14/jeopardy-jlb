@@ -4,5 +4,11 @@
     "title": "Classic Trivia Night",
     "author": "Sample Game",
     "file": "games/classic-trivia.csv"
+  },
+  {
+    "id": "mountain-men",
+    "title": "Mountain Men",
+    "author": "Justin",
+    "file": "games/mountain-men.csv"
   }
 ]
