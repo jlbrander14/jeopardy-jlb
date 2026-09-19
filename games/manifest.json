@@ -6,6 +6,12 @@
     "file": "games/beers-beers-galore.csv"
   },
   {
+    "id": "bernsley-grab-bag",
+    "title": "Bernsley's Grab Bag",
+    "author": "Bernsley",
+    "file": "games/bernsley-grab-bag.csv"
+  },
+  {
     "id": "classic-trivia",
     "title": "Classic Trivia Night",
     "author": "Sample Game",
