@@ -18,6 +18,12 @@
     "file": "games/classic-trivia.csv"
   },
   {
+    "id": "jordans-jizz",
+    "title": "Jordan's Jizz",
+    "author": "Jordan Gollinger",
+    "file": "games/jordans-jizz.csv"
+  },
+  {
     "id": "mountain-men",
     "title": "Mountain Men",
     "author": "Justin",
